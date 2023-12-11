@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism-okaidia.min.css">
+  <title>TCgui</title>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h2>Open or make a file.</h2>
+      <button onclick="saveFile()">Save File</button>
+    </div>
+    <main>
+      <!-- Use a pre/code for syntax highlighting -->
+      <pre>
+        <code id="fileContent" class="language-javascript" rows="10" cols="50"></code>
+      </pre>
+      <input type="file" id="fileInput" onchange="loadFileContent()" />
+    </main>
+  </div>
+  <script src="/main.js"></script>
+  <script src="/view/app.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-core.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/plugins/autoloader/prism-autoloader.min.js"></script>
+
+  <script>
+    // Commenting out electron-related code for running in a browser environment
+    // const { ipcRenderer } = require('electron');
+
+    function loadFileContent() {
+      // Update the text inside the h2 element
+      document.querySelector('.header h2').innerText = '';
+
+      // Clear the content of the fileContent code element
+      document.getElementById('fileContent').textContent = '';
+
+      // Get the selected file
+      const fileInput = document.getElementById('fileInput');
+      const file = fileInput.files[0];
+
+      if (file) {
+        const reader = new FileReader();
+
+        reader.onload = function (e) {
+          // Update the value of the fileContent code element with the file content
+          document.getElementById('fileContent').textContent = e.target.result;
+
+          // Highlight the code using Prism
+          Prism.highlightAll();
+        };
+
+        reader.readAsText(file);
+      }
+    }
+
+    function saveFile() {
+      // Get the content of the code element
+      const content = document.getElementById('fileContent').textContent;
+
+      // Create a Blob with the content
+      const blob = new Blob([content], { type: 'text/plain' });
+
+      // Create a link element to trigger the download
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'savedFile.txt';
+
+      // Append the link to the body and trigger the download
+      document.body.appendChild(link);
+      link.click();
+
+      // Remove the link from the body
+      document.body.removeChild(link);
+    }
+  </script>
+</body>
+</html>
